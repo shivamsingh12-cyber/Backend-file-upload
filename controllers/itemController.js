@@ -28,7 +28,39 @@ export const updateItem=async (req,res)=>{
         )
         if(!updateItem) return res.status(404).json({message:"Item did not updated"});
    
-        res.status(200).json(updateItem);
+        res.status(200).json({message:"Item updated successfully"});
+
+    } catch (err) {
+        res.status(500).json({error:err.message});
+    }
+};
+
+export const deleteItem=async (req,res)=>{
+    try {
+         const {id}= req.body;
+        const {name,price}= req.body;
+
+        const updateItem=await Item.findByIdAndDelete(
+            id
+        )
+        if(!updateItem) return res.status(404).json({message:"Item did not Deleted"});
+   
+        res.status(200).json({message:"Item deleted successfully"});
+
+    } catch (err) {
+        res.status(500).json({error:err.message});
+    }
+};
+
+export const readItem=async (req,res)=>{
+    try {
+         const {id}= req.query;
+          console.log("Incoming ID:", id);
+
+        const fetchItem=await  Item.findById(id);
+        if(!fetchItem) return res.status(404).json({message:"Item did not Found"});
+   
+        res.status(200).json(fetchItem);
 
     } catch (err) {
         res.status(500).json({error:err.message});
