@@ -67,3 +67,27 @@ export const readItem=async (req,res)=>{
     }
 };
 
+export const uploadFile=async (req,res)=>{
+    try {
+         if (!req.file) {
+            return res.status(404).json({message:"Your file is not uploaded"});
+         }
+         
+         const create= await Item.create({
+            originalName:req.file.originalname,
+            fileName:req.file.filename,
+            filePath: req.file.path,
+            fileSize: req.file.size,
+            mimeType: req.file.mimetype
+         })
+
+         res.status(200).json({
+            message: "File uploaded and saved in DB",
+            info: create
+         })
+
+    } catch (err) {
+       next(err);
+    }
+};
+
