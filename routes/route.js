@@ -17,6 +17,6 @@ Router.get("/readitem",readItem);
 
 
 
-Router.post("/uploadFile",upload.single('file'), uploadFile);
+Router.post("/uploadFile",upload.array('file'), uploadFile);
 
 export default Router;

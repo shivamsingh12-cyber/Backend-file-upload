@@ -70,43 +70,41 @@ export const readItem=async (req,res)=>{
     }
 };
 
-export const uploadFile=async (req,res, next)=>{
+export const uploadFile = async (req, res, next) => {
     try {
-         if (!req.file) {
-            return res.status(400).json({message:"Your file is not uploaded"});
-         }
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ message: "No files uploaded" });
+        }
 
-         const buffer=req.file.buffer;
-         const resizeBuffer=await resizeImage(buffer);
-       
+        const results = [];
 
-        const uploadDir=path.join(process.cwd(),"upload");
+        for (const file of req.files) {
+            const resizedBuffer = await resizeImage(file.buffer);
 
-     
-           await fs.promises.mkdir(uploadDir,{recursive:true});
-        
+            const fileName = `resize-${Date.now()}-${Math.random()}.jpg`;
+            const filePath = path.join(process.cwd(), "upload", fileName);
 
-         const fileName = `resize-${Date.now()}.jpg`;
+            await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
+            await fs.promises.writeFile(filePath, resizedBuffer);
 
-         const filePath= path.join(uploadDir,fileName);
+            const saved = await Item.create({
+                originalName: file.originalname,
+                fileName,
+                filePath,
+                fileSize: resizedBuffer.length,
+                mimeType: "image/jpeg"
+            });
 
-         await fs.promises.writeFile(filePath, resizeBuffer);
+            results.push(saved);
+        }
 
-         const create= await Item.create({
-            originalName: req.file.originalname,
-            fileName: fileName,
-            filePath: filePath,
-            fileSize: resizeBuffer.length,
-            mimeType: "image/jpeg"
-         })
-
-         res.status(200).json({
-            message: "File uploaded and saved in DB",
-            info: create
-         })
+        res.json({
+            message: "Files uploaded successfully",
+            data: results
+        });
 
     } catch (err) {
-       next(err);
+        next(err);
     }
 };
 
