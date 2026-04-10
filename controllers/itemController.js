@@ -1,7 +1,4 @@
 import {Item} from "../models/Item.js";
-import { resizeImage } from "../services/image.service.js";
-import path from "path"
-import fs from "fs"
 
 export const createItem=async (req,res)=>{
     try {
@@ -70,34 +67,18 @@ export const readItem=async (req,res)=>{
     }
 };
 
-export const uploadFile=async (req,res, next)=>{
+export const uploadFile=async (req,res)=>{
     try {
          if (!req.file) {
-            return res.status(400).json({message:"Your file is not uploaded"});
+            return res.status(404).json({message:"Your file is not uploaded"});
          }
-
-         const buffer=req.file.buffer;
-         const resizeBuffer=await resizeImage(buffer);
-       
-
-        const uploadDir=path.join(process.cwd(),"upload");
-
-     
-           await fs.promises.mkdir(uploadDir,{recursive:true});
-        
-
-         const fileName = `resize-${Date.now()}.jpg`;
-
-         const filePath= path.join(uploadDir,fileName);
-
-         await fs.promises.writeFile(filePath, resizeBuffer);
-
+         
          const create= await Item.create({
-            originalName: req.file.originalname,
-            fileName: fileName,
-            filePath: filePath,
-            fileSize: resizeBuffer.length,
-            mimeType: "image/jpeg"
+            originalName:req.file.originalname,
+            fileName:req.file.filename,
+            filePath: req.file.path,
+            fileSize: req.file.size,
+            mimeType: req.file.mimetype
          })
 
          res.status(200).json({
