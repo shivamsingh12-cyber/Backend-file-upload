@@ -2,6 +2,7 @@ import {Item} from "../models/Item.js";
 import { resizeImage } from "../services/image.service.js";
 import path from "path"
 import fs from "fs"
+import {imageQueue} from '../queues/image.queue.js'
 
 export const createItem=async (req,res)=>{
     try {

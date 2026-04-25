@@ -20,3 +20,5 @@ Router.get("/readitem",readItem);
 Router.post("/uploadFile",upload.array('file'), uploadFile);
 
 export default Router;
+
+// docker run -d --name redis-stack -p b379:6379 -p 8001:8001 redis/redis-stack:latest
