@@ -77,31 +77,15 @@ export const uploadFile = async (req, res, next) => {
             return res.status(400).json({ message: "No files uploaded" });
         }
 
-        const results = [];
-
-        for (const file of req.files) {
-            const resizedBuffer = await resizeImage(file.buffer);
-
-            const fileName = `resize-${Date.now()}-${Math.random()}.jpg`;
-            const filePath = path.join(process.cwd(), "upload", fileName);
-
-            await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
-            await fs.promises.writeFile(filePath, resizedBuffer);
-
-            const saved = await Item.create({
-                originalName: file.originalname,
-                fileName,
-                filePath,
-                fileSize: resizedBuffer.length,
-                mimeType: "image/jpeg"
-            });
-
-            results.push(saved);
-        }
-
+      for(const file of req.files){
+        await imageQueue.add("resize",{
+            file:file.buffer,
+            originalName:file.originalName
+        });
+      }
         res.json({
-            message: "Files uploaded successfully",
-            data: results
+            message: "Files queue for processing",
+            // data: results
         });
 
     } catch (err) {

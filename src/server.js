@@ -1,15 +1,12 @@
 import app from "./app.js";
-import mongoose from 'mongoose';
+// import mongoose from 'mongoose';
 import dotenv from "dotenv";
+import connectDB from "../config/db.js";
 dotenv.config();
 
 
 
-mongoose.connect("mongodb://127.0.0.1:27017/fileUploadDB")
-.then(()=>console.log("You are connected to mongodb"))
-.catch((err)=>{
-    "MongoDB Error::",err
-});
+await connectDB();
 
 const PORT = process.env.PORT || 5000;
 
