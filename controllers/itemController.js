@@ -80,13 +80,16 @@ export const uploadFile = async (req, res, next) => {
        
 
       for(const file of req.files){
-        
-         const tempPath = path.join(process.cwd(), "temp", `${Date.now()}.jpg`);
+
+         const tempPath = path.join(
+            process.cwd(), 
+            "temp", 
+            `${Date.now()}-${Math.random()}.jpg`);
         await fs.promises.mkdir(path.dirname(tempPath), { recursive: true });
         await fs.promises.writeFile(tempPath, file.buffer);
 
         await imageQueue.add("resize",{
-            file:tempPath,
+            filePath:tempPath,
             originalName:file.originalname
         });
       }

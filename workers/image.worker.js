@@ -11,31 +11,32 @@ await connectDB();
 const worker =new Worker("image-processing",
     async (job)=>{
         try{
-             const {file,originalName}=job.data;
+             const {filePath: tempPath,originalName}=job.data;
 
        
-
-    // const resizeBuffer=await resizeImage(file);
-
+// Read Input
+             const inputBuffer = await fs.promises.readFile(filePath);
   
 
-    const fileName=`resize-${Date.now()}.jpg`;
-    const filePath=path.join(process.cwd(),"uploads",fileName);
-          const inputBuffer = await fs.promises.readFile(filePath);
-
+  
+// Process
 const resizeBuffer = await resizeImage(inputBuffer);
+
+    const fileName=`resize-${Date.now()}.jpg`;
+    const finalPath=path.join(process.cwd(),"upload",fileName);
+
 
 
     await fs.promises.mkdir(path.dirname(filePath),{recursive:true});
 
     await fs.promises.writeFile(filePath,resizeBuffer);
    
-await fs.promises.unlink(filePath);
+await fs.promises.unlink(tempPath);
 
             const saved = await Item.create({
-                originalName: originalName,
+                originalName: 
                 fileName,
-                filePath,
+                filePath, finalPath,
                 fileSize: resizeBuffer.length,
                 mimeType: "image/jpeg"
             });
